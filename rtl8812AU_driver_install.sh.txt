@@ -1,0 +1,43 @@
+#!/bin/bash
+###
+#
+#  File:  rtl8812AU_driver_install.sh.txt
+#  Purpose:  Install Realtek RTL8812AU chipset linux kernel driver for AC1200 (801.11ac) Wireless Dual-Band USB adapter, within a RPM distro
+#            NB:  I did include notes for dpkg distros as well; maybe in the future I'll include an if state to detect versions
+#  Author:  rac3rx
+#  Date:  21:44, 10/05/15
+#
+# REF:
+# https://wiki.gentoo.org/wiki/AC1200_Wireless_Adaptersgithub.com/abperiasamy/rtl8812AU_8821AU_linux
+# https://github.com/abperiasamy/rtl8812AU_8821AU_linux
+# Alfa's AWUS036ACH driver :: didn't try based on reports
+# https://www.dropbox.com/s/bvk0qm6d4qiblhe/AWUS036AC_ACH_Linux_v4.3.14.zip?dl=0
+# https://forums.kali.org/showthread.php?27673-New-Alfa-awus036ach-help
+# https://github.com/csssuf/rtl8812au
+# https://forums.kali.org/showthread.php?26110-AWUS036ACH-and-driver-issues
+###
+
+dnf update                                                                         # update system first
+dnf -y --best --allowerasing install kernel-headers kernel kernel-devel gcc make   # had to add switches --best --allowerasing for Fedora 22 YMMV
+                                                                                   # you'll use yum for centos7/rhel7
+                                                                                   # Debian/Ubuntu/Mint equivalent down below
+                                                                                   # apt-get install -y linux-headers-$(uname -r)
+                                                                                   # make / make install worked fine without the following command
+                                                                                   # dnf groupinstall "Development tools"
+
+reboot                                                                             # not sure if reboot was needed
+
+git clone https://github.com/abperiasamy/rtl8812AU_8821AU_linux                    # use git to clone AB's Real; install git if you don't have it
+                                                                                   # Anand Babu (AB) Periasamy's Realtek 8812AU linux driver for the AC1200 Wireless Adapter
+                                                                                   # which I have tested with Alfa AWUS036ACH USB WIFI adapter
+        
+cd rtl8812AU_8821AU_linux                                                          # cd into the target directory
+
+make                                                                               # run make; use sudo if inclined
+
+make install                                                                       # run make install; initially I had conflicts with software until I used the switches 
+                                                                                   # --best --allowerasing /w dnf install kernel-headers kernel kernel-devel gcc make
+ 
+modprobe -v 8812au                                                                 # load the 8812au realtek wireless adapter driver
+lsmod |grep 8812                                                                   # verify it was loaded
+
